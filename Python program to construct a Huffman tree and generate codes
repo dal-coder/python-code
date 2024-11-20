@@ -1,0 +1,48 @@
+from heapq import heappush, heappop
+
+class Node:
+    def __init__(self, char, freq):
+        self.char = char
+        self.freq = freq
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def build_huffman_tree(char_freq):
+    heap = [Node(char, freq) for char, freq in char_freq.items()]
+    heapify(heap)
+
+    while len(heap) > 1:
+        left = heappop(heap)
+        right = heappop(heap)
+        parent = Node(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        heappush(heap, parent)
+
+    return heappop(heap)
+
+def generate_codes(root, code, huffman_code):
+    if root is None:
+        return
+
+    if root.char is not None:
+        huffman_code[root.char] = code
+
+    generate_codes(root.left, code + '0', huffman_code)
+    generate_codes(root.right, code + '1', huffman_code)
+
+def huffman_encoding(char_freq):
+    root = build_huffman_tree(char_freq)
+    huffman_code = {}
+    generate_codes(root, '', huffman_code)
+    return huffman_code
+
+# Example usage
+char_freq = {'a': 5, 'b': 9, 'c': 12, 'd': 13, 'e': 16, 'f': 45}
+huffman_code = huffman_encoding(char_freq)
+
+for char, code in huffman_code.items():
+    print(f'{char}: {code}')
